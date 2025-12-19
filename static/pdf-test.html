@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PDF 분석 테스트 페이지</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .section {
+            margin-bottom: 30px;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            background-color: #fafafa;
+        }
+        .section h3 {
+            margin-top: 0;
+            color: #555;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #333;
+        }
+        input[type="file"], select, textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+            box-sizing: border-box;
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            margin-right: 10px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        button:disabled {
+            background-color: #6c757d;
+            cursor: not-allowed;
+        }
+        .response {
+            margin-top: 15px;
+            padding: 15px;
+            border-radius: 4px;
+            background-color: #f8f9fa;
+            border-left: 4px solid #007bff;
+            white-space: pre-wrap;
+            font-family: monospace;
+            font-size: 12px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        .error {
+            border-left-color: #dc3545;
+            background-color: #f8d7da;
+        }
+        .success {
+            border-left-color: #28a745;
+            background-color: #d4edda;
+        }
+        .loading {
+            text-align: center;
+            padding: 20px;
+            color: #666;
+        }
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #3498db;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 10px auto;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .result-section {
+            margin-top: 20px;
+        }
+        .result-tabs {
+            display: flex;
+            border-bottom: 1px solid #ddd;
+            margin-bottom: 15px;
+        }
+        .tab {
+            padding: 10px 20px;
+            cursor: pointer;
+            border: none;
+            background: none;
+            font-size: 14px;
+            border-bottom: 2px solid transparent;
+        }
+        .tab.active {
+            border-bottom-color: #007bff;
+            color: #007bff;
+            font-weight: bold;
+        }
+        .tab-content {
+            display: none;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            background-color: white;
+            max-height: 500px;
+            overflow-y: auto;
+        }
+        .tab-content.active {
+            display: block;
+        }
+        .metadata {
+            background-color: #e9ecef;
+            padding: 10px;
+            border-radius: 4px;
+            margin-bottom: 15px;
+        }
+        .models-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        .model-badge {
+            background-color: #e9ecef;
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 12px;
+            border: 1px solid #ced4da;
+        }
+        .analysis-content {
+            line-height: 1.6;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📄 PDF 분석 테스트 페이지</h1>
+        
+        <!-- 사용 가능한 모델 조회 -->
+        <div class="section">
+            <h3>🤖 사용 가능한 Ollama 모델</h3>
+            <button onclick="loadModels()">모델 목록 조회</button>
+            <div id="modelsResponse" class="response" style="display: none;"></div>
+            <div id="modelsList" class="models-list"></div>
+        </div>
+
+        <!-- PDF 업로드 및 분석 -->
+        <div class="section">
+            <h3>📤 PDF 업로드 및 분석</h3>
+            <form id="pdfForm" onsubmit="analyzePDF(event)">
+                <div class="form-group">
+                    <label for="pdfFile">PDF 파일 선택:</label>
+                    <input type="file" id="pdfFile" accept=".pdf" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="modelSelect">분석 모델 (멀티모달 지원):</label>
+                    <select id="modelSelect" required>
+                        <option value="gemma3:4b">Gemma3 4B (멀티모달, 추천)</option>
+                        <option value="qwen3:1.7b">Qwen3 1.7B</option>
+                        <option value="qwen3:0.6b">Qwen3 0.6B</option>
+                        <option value="gemma3:1b">Gemma3 1B</option>
+                        <option value="gpt-oss:20b">GPT-OSS 20B</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="customPrompt">사용자 정의 프롬프트 (선택사항):</label>
+                    <textarea id="customPrompt" rows="4" placeholder="예: 이 문서에서 주요 결론과 수치들을 정리해주세요."></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label>
+                        <input type="radio" name="analysisType" value="sync" checked> 즉시 분석 (동기)
+                    </label>
+                    <label style="margin-left: 20px;">
+                        <input type="radio" name="analysisType" value="async"> 백그라운드 분석 (비동기 + 진행률)
+                    </label>
+                </div>
+                
+                <button type="submit" id="analyzeBtn">PDF 분석하기</button>
+                <button type="button" id="cancelBtn" onclick="cancelAnalysis()" style="display: none; background-color: #dc3545;">분석 취소</button>
+            </form>
+            
+            <div id="loadingDiv" class="loading" style="display: none;">
+                <div class="spinner"></div>
+                <p id="loadingText">PDF를 분석 중입니다... 잠시만 기다려주세요.</p>
+                <div id="progressInfo" style="display: none;">
+                    <div style="background: #f0f0f0; border-radius: 10px; margin: 10px 0;">
+                        <div id="progressBar" style="background: #007bff; height: 20px; border-radius: 10px; width: 0%; transition: width 0.3s;"></div>
+                    </div>
+                    <p id="progressText">0% - 분석 시작 중...</p>
+                    <p id="currentStep"></p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 분석 결과 -->
+        <div id="resultSection" class="result-section" style="display: none;">
+            <h3>📊 분석 결과</h3>
+            
+            <div id="metadata" class="metadata"></div>
+            
+            <div class="result-tabs">
+                <button class="tab active" onclick="showTab('analysis')">🧠 AI 분석 결과</button>
+                <button class="tab" onclick="showTab('rawText')">📝 추출된 텍스트</button>
+                <button class="tab" onclick="showTab('json')">🔧 JSON 응답</button>
+            </div>
+            
+            <div id="analysisTab" class="tab-content active">
+                <div id="analysisContent" class="analysis-content"></div>
+            </div>
+            
+            <div id="rawTextTab" class="tab-content">
+                <pre id="rawTextContent"></pre>
+            </div>
+            
+            <div id="jsonTab" class="tab-content">
+                <pre id="jsonContent"></pre>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:8000';
+        let currentResult = null;
+        let currentTaskId = null;
+        let statusCheckInterval = null;
+
+        async function makeRequest(url, options = {}) {
+            try {
+                const response = await fetch(url, options);
+                const data = await response.json();
+                return { data, isError: !response.ok, status: response.status };
+            } catch (error) {
+                return { data: { error: error.message }, isError: true };
+            }
+        }
+
+        function showResponse(elementId, data, isError = false) {
+            const element = document.getElementById(elementId);
+            element.style.display = 'block';
+            element.textContent = JSON.stringify(data, null, 2);
+            element.className = isError ? 'response error' : 'response success';
+        }
+
+        async function loadModels() {
+            const { data, isError } = await makeRequest(`${API_BASE}/ollama/models`);
+            showResponse('modelsResponse', data, isError);
+            
+            if (!isError && data.models) {
+                displayModelsList(data.models);
+                updateModelSelect(data.models);
+            }
+        }
+
+        function displayModelsList(models) {
+            const listElement = document.getElementById('modelsList');
+            listElement.innerHTML = models.map(model => 
+                `<span class="model-badge">${model}</span>`
+            ).join('');
+        }
+
+        function updateModelSelect(models) {
+            const modelSelect = document.getElementById('modelSelect');
+            if (!modelSelect) return;
+            
+            const currentOptions = Array.from(modelSelect.options).map(opt => opt.value);
+            
+            models.forEach(model => {
+                if (!currentOptions.includes(model)) {
+                    const option = document.createElement('option');
+                    option.value = model;
+                    option.textContent = model;
+                    modelSelect.appendChild(option);
+                }
+            });
+        }
+
+        async function analyzePDF(event) {
+            event.preventDefault();
+            
+            const fileInput = document.getElementById('pdfFile');
+            const modelSelect = document.getElementById('modelSelect');
+            const customPrompt = document.getElementById('customPrompt');
+            const analysisType = document.querySelector('input[name="analysisType"]:checked').value;
+            const analyzeBtn = document.getElementById('analyzeBtn');
+            const cancelBtn = document.getElementById('cancelBtn');
+            const loadingDiv = document.getElementById('loadingDiv');
+            const resultSection = document.getElementById('resultSection');
+            
+            if (!fileInput.files[0]) {
+                alert('PDF 파일을 선택해주세요.');
+                return;
+            }
+            
+            if (!modelSelect.value) {
+                alert('분석 모델을 선택해주세요.');
+                return;
+            }
+            
+            const formData = new FormData();
+            formData.append('file', fileInput.files[0]);
+            formData.append('model', modelSelect.value);
+            if (customPrompt.value.trim()) {
+                formData.append('custom_prompt', customPrompt.value.trim());
+            }
+            
+            analyzeBtn.disabled = true;
+            loadingDiv.style.display = 'block';
+            resultSection.style.display = 'none';
+            
+            if (analysisType === 'async') {
+                cancelBtn.style.display = 'inline-block';
+                document.getElementById('progressInfo').style.display = 'block';
+                await startAsyncAnalysis(formData);
+            } else {
+                await startSyncAnalysis(formData);
+            }
+        }
+        
+        async function startSyncAnalysis(formData) {
+            const analyzeBtn = document.getElementById('analyzeBtn');
+            const loadingDiv = document.getElementById('loadingDiv');
+            const resultSection = document.getElementById('resultSection');
+            
+            try {
+                const response = await fetch(`${API_BASE}/pdf/analyze`, {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const result = await response.json();
+                
+                if (response.ok) {
+                    currentResult = result;
+                    displayResult(result);
+                    resultSection.style.display = 'block';
+                } else {
+                    alert(`오류가 발생했습니다: ${result.detail || '알 수 없는 오류'}`);
+                }
+            } catch (error) {
+                alert(`네트워크 오류가 발생했습니다: ${error.message}`);
+            } finally {
+                analyzeBtn.disabled = false;
+                loadingDiv.style.display = 'none';
+            }
+        }
+        
+        async function startAsyncAnalysis(formData) {
+            try {
+                const response = await fetch(`${API_BASE}/pdf/analyze-async`, {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const result = await response.json();
+                
+                if (response.ok) {
+                    currentTaskId = result.task_id;
+                    startStatusPolling();
+                } else {
+                    alert(`오류가 발생했습니다: ${result.detail || '알 수 없는 오류'}`);
+                    resetUI();
+                }
+            } catch (error) {
+                alert(`네트워크 오류가 발생했습니다: ${error.message}`);
+                resetUI();
+            }
+        }
+        
+        function startStatusPolling() {
+            statusCheckInterval = setInterval(async () => {
+                try {
+                    const response = await fetch(`${API_BASE}/tasks/${currentTaskId}/status`);
+                    const status = await response.json();
+                    
+                    updateProgress(status);
+                    
+                    if (status.status === 'completed') {
+                        clearInterval(statusCheckInterval);
+                        currentResult = status.result;
+                        displayResult(status.result);
+                        document.getElementById('resultSection').style.display = 'block';
+                        resetUI();
+                    } else if (status.status === 'failed' || status.status === 'cancelled') {
+                        clearInterval(statusCheckInterval);
+                        alert(status.error || '분석이 취소되었습니다.');
+                        resetUI();
+                    }
+                } catch (error) {
+                    console.error('상태 확인 실패:', error);
+                    clearInterval(statusCheckInterval);
+                    resetUI();
+                }
+            }, 1000);
+        }
+        
+        function updateProgress(status) {
+            const progressBar = document.getElementById('progressBar');
+            const progressText = document.getElementById('progressText');
+            const currentStep = document.getElementById('currentStep');
+            
+            progressBar.style.width = `${status.progress}%`;
+            progressText.textContent = `${status.progress}% - ${status.status}`;
+            currentStep.textContent = status.current_step;
+        }
+        
+        async function cancelAnalysis() {
+            if (!currentTaskId) return;
+            
+            try {
+                await fetch(`${API_BASE}/tasks/${currentTaskId}/cancel`, {
+                    method: 'POST'
+                });
+                clearInterval(statusCheckInterval);
+                resetUI();
+                alert('분석이 취소되었습니다.');
+            } catch (error) {
+                alert('취소 중 오류가 발생했습니다.');
+            }
+        }
+        
+        function resetUI() {
+            document.getElementById('analyzeBtn').disabled = false;
+            document.getElementById('cancelBtn').style.display = 'none';
+            document.getElementById('loadingDiv').style.display = 'none';
+            document.getElementById('progressInfo').style.display = 'none';
+            currentTaskId = null;
+        }
+
+        function displayResult(result) {
+            // 메타데이터 표시
+            const metadata = document.getElementById('metadata');
+            metadata.innerHTML = `
+                <strong>파일명:</strong> ${result.filename}<br>
+                <strong>사용된 모델:</strong> ${result.model_used} (멀티모달)<br>
+                <strong>페이지 수:</strong> ${result.page_count}페이지<br>
+                <strong>추출된 텍스트 길이:</strong> ${result.text_content.length.toLocaleString()}자
+            `;
+            
+            // 분석 결과 표시
+            const analysisContent = document.getElementById('analysisContent');
+            analysisContent.innerHTML = result.analysis.replace(/\n/g, '<br>');
+            
+            // 원본 텍스트 표시
+            const rawTextContent = document.getElementById('rawTextContent');
+            rawTextContent.textContent = result.text_content;
+            
+            // JSON 응답 표시
+            const jsonContent = document.getElementById('jsonContent');
+            jsonContent.textContent = JSON.stringify(result, null, 2);
+        }
+
+        function showTab(tabName) {
+            // 모든 탭 비활성화
+            document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+            
+            // 선택된 탭 활성화
+            event.target.classList.add('active');
+            document.getElementById(tabName + 'Tab').classList.add('active');
+        }
+
+        // 페이지 로드 시 모델 목록 조회
+        window.onload = function() {
+            loadModels();
+        };
+    </script>
+</body>
+</html>

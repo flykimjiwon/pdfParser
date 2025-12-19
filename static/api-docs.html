@@ -1,0 +1,686 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PDF Analysis API Documentation</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f8f9fa;
+            line-height: 1.6;
+        }
+        .container {
+            background: white;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 2px 20px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 10px;
+            font-size: 2.5em;
+        }
+        .subtitle {
+            text-align: center;
+            color: #7f8c8d;
+            margin-bottom: 40px;
+            font-size: 1.2em;
+        }
+        h2 {
+            color: #34495e;
+            border-bottom: 3px solid #3498db;
+            padding-bottom: 10px;
+            margin-top: 40px;
+        }
+        h3 {
+            color: #2980b9;
+            margin-top: 30px;
+        }
+        .endpoint {
+            background: #ecf0f1;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+            border-left: 5px solid #3498db;
+        }
+        .method {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 4px;
+            color: white;
+            font-weight: bold;
+            font-size: 0.9em;
+            margin-right: 10px;
+        }
+        .get { background-color: #27ae60; }
+        .post { background-color: #e74c3c; }
+        .put { background-color: #f39c12; }
+        .delete { background-color: #c0392b; }
+        code {
+            background: #2c3e50;
+            color: #ecf0f1;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Monaco', 'Courier New', monospace;
+        }
+        pre {
+            background: #2c3e50;
+            color: #ecf0f1;
+            padding: 20px;
+            border-radius: 8px;
+            overflow-x: auto;
+            font-family: 'Monaco', 'Courier New', monospace;
+            line-height: 1.4;
+        }
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin: 30px 0;
+        }
+        .feature-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 25px;
+            border-radius: 10px;
+            text-align: center;
+        }
+        .feature-card h4 {
+            margin: 0 0 15px 0;
+            font-size: 1.3em;
+        }
+        .params-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+        }
+        .params-table th,
+        .params-table td {
+            border: 1px solid #bdc3c7;
+            padding: 12px;
+            text-align: left;
+        }
+        .params-table th {
+            background-color: #34495e;
+            color: white;
+        }
+        .params-table tr:nth-child(even) {
+            background-color: #f8f9fa;
+        }
+        .nextjs-example {
+            background: #e8f5e8;
+            border-left: 5px solid #27ae60;
+        }
+        .note {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            color: #856404;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        .warning {
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        .copy-btn {
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            float: right;
+            font-size: 0.8em;
+        }
+        .copy-btn:hover {
+            background: #2980b9;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🚀 PDF Analysis API</h1>
+        <div class="subtitle">Complete PDF Analysis with Multimodal AI</div>
+        
+        <div class="feature-grid">
+            <div class="feature-card">
+                <h4>📄 텍스트 추출</h4>
+                <p>정확한 텍스트 인식 및 추출</p>
+            </div>
+            <div class="feature-card">
+                <h4>📊 테이블 파싱</h4>
+                <p>복잡한 표 구조 자동 인식</p>
+            </div>
+            <div class="feature-card">
+                <h4>🖼️ 이미지 분석</h4>
+                <p>이미지 내 텍스트 및 내용 추출</p>
+            </div>
+            <div class="feature-card">
+                <h4>🤖 AI 분석</h4>
+                <p>Gemma3 멀티모달 모델로 통합 분석</p>
+            </div>
+        </div>
+
+        <h2>🌐 Base URL</h2>
+        <pre><code>http://localhost:8000</code> <button class="copy-btn" onclick="copyText('http://localhost:8000')">Copy</button></pre>
+
+        <h2>📡 API Endpoints</h2>
+
+        <div class="endpoint">
+            <h3><span class="method get">GET</span>/</h3>
+            <p><strong>설명:</strong> API 상태 확인</p>
+            <p><strong>응답:</strong></p>
+            <pre><code>{
+  "message": "Hello World!"
+}</code></pre>
+        </div>
+
+        <div class="endpoint">
+            <h3><span class="method get">GET</span>/ollama/models</h3>
+            <p><strong>설명:</strong> 사용 가능한 Ollama 모델 목록 조회</p>
+            <p><strong>응답:</strong></p>
+            <pre><code>{
+  "models": [
+    "gemma3:4b",
+    "qwen3:1.7b",
+    "qwen3:0.6b"
+  ]
+}</code></pre>
+        </div>
+
+        <div class="endpoint">
+            <h3><span class="method post">POST</span>/pdf/analyze</h3>
+            <p><strong>설명:</strong> PDF 파일 업로드 및 즉시 분석 (동기 처리)</p>
+            
+            <h4>📥 Request Parameters</h4>
+            <table class="params-table">
+                <thead>
+                    <tr>
+                        <th>Parameter</th>
+                        <th>Type</th>
+                        <th>Required</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><code>file</code></td>
+                        <td>File</td>
+                        <td>✅ Yes</td>
+                        <td>PDF 파일 (multipart/form-data)</td>
+                    </tr>
+                    <tr>
+                        <td><code>model</code></td>
+                        <td>String</td>
+                        <td>❌ No</td>
+                        <td>분석 모델 (기본값: "gemma3:4b")</td>
+                    </tr>
+                    <tr>
+                        <td><code>custom_prompt</code></td>
+                        <td>String</td>
+                        <td>❌ No</td>
+                        <td>사용자 정의 분석 프롬프트</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h4>📤 Response</h4>
+            <pre><code>{
+  "filename": "document.pdf",
+  "text_content": "--- 페이지 1 ---\n추출된 텍스트...\n\n[표 1]\n항목 | 내용\n금액 | 1,000원\n\n[이미지 1개 분석 결과]\n이미지 1 분석:\n이 이미지에는 '서명: 홍길동'이라는 텍스트가...",
+  "analysis": "이 문서는 차용증으로, 주요 내용은 다음과 같습니다:\n- 차용 금액: 1,000원\n- 차용자: 홍길동\n...",
+  "model_used": "gemma3:4b",
+  "page_count": 2
+}</code></pre>
+        </div>
+
+        <div class="endpoint">
+            <h3><span class="method post">POST</span>/pdf/analyze-async</h3>
+            <p><strong>설명:</strong> PDF 파일 비동기 분석 (백그라운드 처리, 진행률 추적, 취소 지원)</p>
+            
+            <h4>📥 Request Parameters</h4>
+            <table class="params-table">
+                <thead>
+                    <tr>
+                        <th>Parameter</th>
+                        <th>Type</th>
+                        <th>Required</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><code>file</code></td>
+                        <td>File</td>
+                        <td>✅ Yes</td>
+                        <td>PDF 파일 (multipart/form-data)</td>
+                    </tr>
+                    <tr>
+                        <td><code>model</code></td>
+                        <td>String</td>
+                        <td>❌ No</td>
+                        <td>분석 모델 (기본값: "gemma3:4b")</td>
+                    </tr>
+                    <tr>
+                        <td><code>custom_prompt</code></td>
+                        <td>String</td>
+                        <td>❌ No</td>
+                        <td>사용자 정의 분석 프롬프트</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h4>📤 Response</h4>
+            <pre><code>{
+  "task_id": "123e4567-e89b-12d3-a456-426614174000",
+  "status": "processing",
+  "message": "PDF 분석이 시작되었습니다"
+}</code></pre>
+        </div>
+
+        <div class="endpoint">
+            <h3><span class="method get">GET</span>/tasks/{task_id}/status</h3>
+            <p><strong>설명:</strong> 비동기 작업 진행 상태 확인</p>
+            
+            <h4>📤 Response</h4>
+            <pre><code>{
+  "task_id": "123e4567-e89b-12d3-a456-426614174000",
+  "status": "processing", // "processing", "completed", "failed", "cancelled"
+  "progress": 65,  // 0-100
+  "current_step": "페이지 3/5 이미지 2/3 분석 중",
+  "result": null,  // completed일 때 PDFAnalysisResponse 객체
+  "error": null    // failed일 때 오류 메시지
+}</code></pre>
+        </div>
+
+        <div class="endpoint">
+            <h3><span class="method post">POST</span>/tasks/{task_id}/cancel</h3>
+            <p><strong>설명:</strong> 진행 중인 비동기 작업 취소</p>
+            
+            <h4>📤 Response</h4>
+            <pre><code>{
+  "message": "Task cancelled successfully"
+}</code></pre>
+        </div>
+
+        <div class="endpoint">
+            <h3><span class="method get">GET</span>/tasks</h3>
+            <p><strong>설명:</strong> 모든 작업 목록 조회</p>
+            
+            <h4>📤 Response</h4>
+            <pre><code>{
+  "tasks": [
+    {
+      "task_id": "123e4567-e89b-12d3-a456-426614174000",
+      "status": "completed",
+      "progress": 100,
+      "current_step": "분석 완료",
+      "filename": "document.pdf",
+      "model": "gemma3:4b"
+    }
+  ]
+}</code></pre>
+        </div>
+
+        <h2>🔧 Next.js Integration</h2>
+        
+        <div class="endpoint nextjs-example">
+            <h3>📦 Next.js에서 사용하기</h3>
+            
+            <h4>1. 동기 분석 함수</h4>
+            <pre><code>// utils/pdfAnalysis.js
+export async function analyzePDF(file, model = 'gemma3:4b', customPrompt = '') {
+  const formData = new FormData();
+  formData.append('file', file);
+  formData.append('model', model);
+  if (customPrompt) {
+    formData.append('custom_prompt', customPrompt);
+  }
+
+  try {
+    const response = await fetch('http://localhost:8000/pdf/analyze', {
+      method: 'POST',
+      body: formData,
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error('PDF 분석 실패:', error);
+    throw error;
+  }
+}
+
+// 비동기 분석 시작
+export async function startAsyncPDFAnalysis(file, model = 'gemma3:4b', customPrompt = '') {
+  const formData = new FormData();
+  formData.append('file', file);
+  formData.append('model', model);
+  if (customPrompt) {
+    formData.append('custom_prompt', customPrompt);
+  }
+
+  try {
+    const response = await fetch('http://localhost:8000/pdf/analyze-async', {
+      method: 'POST',
+      body: formData,
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    return await response.json(); // { task_id, status, message }
+  } catch (error) {
+    console.error('비동기 PDF 분석 시작 실패:', error);
+    throw error;
+  }
+}
+
+// 작업 상태 확인
+export async function getTaskStatus(taskId) {
+  try {
+    const response = await fetch(`http://localhost:8000/tasks/${taskId}/status`);
+    
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error('작업 상태 확인 실패:', error);
+    throw error;
+  }
+}
+
+// 작업 취소
+export async function cancelTask(taskId) {
+  try {
+    const response = await fetch(`http://localhost:8000/tasks/${taskId}/cancel`, {
+      method: 'POST',
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error('작업 취소 실패:', error);
+    throw error;
+  }
+}</code> <button class="copy-btn" onclick="copyCode(this)">Copy</button></pre>
+
+            <h4>2. React 컴포넌트 예제</h4>
+            <pre><code>// components/PDFAnalyzer.jsx
+import { useState } from 'react';
+import { analyzePDF } from '../utils/pdfAnalysis';
+
+export default function PDFAnalyzer() {
+  const [file, setFile] = useState(null);
+  const [result, setResult] = useState(null);
+  const [loading, setLoading] = useState(false);
+
+  const handleAnalyze = async () => {
+    if (!file) return;
+    
+    setLoading(true);
+    try {
+      const analysis = await analyzePDF(file);
+      setResult(analysis);
+    } catch (error) {
+      alert('분석 중 오류가 발생했습니다.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    &lt;div&gt;
+      &lt;input 
+        type="file" 
+        accept=".pdf"
+        onChange={(e) =&gt; setFile(e.target.files[0])}
+      /&gt;
+      &lt;button onClick={handleAnalyze} disabled={!file || loading}&gt;
+        {loading ? '분석 중...' : 'PDF 분석'}
+      &lt;/button&gt;
+      
+      {result && (
+        &lt;div&gt;
+          &lt;h3&gt;분석 결과&lt;/h3&gt;
+          &lt;p&gt;&lt;strong&gt;파일:&lt;/strong&gt; {result.filename}&lt;/p&gt;
+          &lt;p&gt;&lt;strong&gt;페이지:&lt;/strong&gt; {result.page_count}페이지&lt;/p&gt;
+          &lt;div&gt;
+            &lt;h4&gt;AI 분석:&lt;/h4&gt;
+            &lt;pre&gt;{result.analysis}&lt;/pre&gt;
+          &lt;/div&gt;
+        &lt;/div&gt;
+      )}
+    &lt;/div&gt;
+  );
+}</code> <button class="copy-btn" onclick="copyCode(this)">Copy</button></pre>
+
+            <h4>3. 비동기 분석 React 컴포넌트 (진행률 + 취소 기능)</h4>
+            <pre><code>// components/AsyncPDFAnalyzer.jsx
+import { useState, useEffect } from 'react';
+import { startAsyncPDFAnalysis, getTaskStatus, cancelTask } from '../utils/pdfAnalysis';
+
+export default function AsyncPDFAnalyzer() {
+  const [file, setFile] = useState(null);
+  const [taskId, setTaskId] = useState(null);
+  const [status, setStatus] = useState(null);
+  const [result, setResult] = useState(null);
+  const [loading, setLoading] = useState(false);
+
+  // 진행 상태 폴링
+  useEffect(() => {
+    if (!taskId) return;
+
+    const interval = setInterval(async () => {
+      try {
+        const taskStatus = await getTaskStatus(taskId);
+        setStatus(taskStatus);
+
+        if (taskStatus.status === 'completed') {
+          setResult(taskStatus.result);
+          setLoading(false);
+          clearInterval(interval);
+        } else if (taskStatus.status === 'failed' || taskStatus.status === 'cancelled') {
+          setLoading(false);
+          clearInterval(interval);
+        }
+      } catch (error) {
+        console.error('상태 확인 실패:', error);
+        clearInterval(interval);
+      }
+    }, 1000); // 1초마다 상태 확인
+
+    return () => clearInterval(interval);
+  }, [taskId]);
+
+  const handleAnalyze = async () => {
+    if (!file) return;
+    
+    setLoading(true);
+    setResult(null);
+    setStatus(null);
+    
+    try {
+      const response = await startAsyncPDFAnalysis(file);
+      setTaskId(response.task_id);
+    } catch (error) {
+      alert('분석 시작 중 오류가 발생했습니다.');
+      setLoading(false);
+    }
+  };
+
+  const handleCancel = async () => {
+    if (!taskId) return;
+    
+    try {
+      await cancelTask(taskId);
+      setLoading(false);
+      setTaskId(null);
+    } catch (error) {
+      alert('취소 중 오류가 발생했습니다.');
+    }
+  };
+
+  return (
+    &lt;div&gt;
+      &lt;input 
+        type=\"file\" 
+        accept=\".pdf\"
+        onChange={(e) =&gt; setFile(e.target.files[0])}
+      /&gt;
+      &lt;button onClick={handleAnalyze} disabled={!file || loading}&gt;
+        PDF 분석 시작
+      &lt;/button&gt;
+      
+      {loading && (
+        &lt;div&gt;
+          &lt;p&gt;분석 중... {status?.progress || 0}%&lt;/p&gt;
+          &lt;p&gt;{status?.current_step}&lt;/p&gt;
+          &lt;button onClick={handleCancel}&gt;취소&lt;/button&gt;
+        &lt;/div&gt;
+      )}
+      
+      {result && (
+        &lt;div&gt;
+          &lt;h3&gt;분석 완료!&lt;/h3&gt;
+          &lt;p&gt;&lt;strong&gt;파일:&lt;/strong&gt; {result.filename}&lt;/p&gt;
+          &lt;p&gt;&lt;strong&gt;페이지:&lt;/strong&gt; {result.page_count}페이지&lt;/p&gt;
+          &lt;div&gt;
+            &lt;h4&gt;AI 분석:&lt;/h4&gt;
+            &lt;pre&gt;{result.analysis}&lt;/pre&gt;
+          &lt;/div&gt;
+        &lt;/div&gt;
+      )}
+    &lt;/div&gt;
+  );
+}</code> <button class="copy-btn" onclick="copyCode(this)">Copy</button></pre>
+
+            <h4>4. TypeScript 타입 정의</h4>
+            <pre><code>// types/pdf.ts
+export interface PDFAnalysisResponse {
+  filename: string;
+  text_content: string;
+  analysis: string;
+  model_used: string;
+  page_count: number;
+  task_id?: string;
+}
+
+export interface PDFAnalysisRequest {
+  file: File;
+  model?: string;
+  custom_prompt?: string;
+}
+
+export interface TaskStatus {
+  task_id: string;
+  status: 'processing' | 'completed' | 'failed' | 'cancelled';
+  progress: number; // 0-100
+  current_step: string;
+  result?: PDFAnalysisResponse;
+  error?: string;
+}
+
+export interface AsyncStartResponse {
+  task_id: string;
+  status: string;
+  message: string;
+}</code> <button class="copy-btn" onclick="copyCode(this)">Copy</button></pre>
+        </div>
+
+        <h2>⚡ 성능 최적화 & 비동기 처리</h2>
+        
+        <div class="note">
+            <h4>🖼️ 이미지 처리 최적화</h4>
+            <p>• <strong>페이지당 이미지 분석:</strong> 10페이지에 각각 이미지가 있다면 10번의 멀티모달 분석이 진행됩니다</p>
+            <p>• <strong>처리 시간:</strong> 이미지가 많을수록 분석 시간이 길어집니다</p>
+            <p>• <strong>비동기 처리:</strong> 긴 처리 시간이 예상되는 경우 <code>/pdf/analyze-async</code> 사용 권장</p>
+            <p>• <strong>진행률 추적:</strong> 실시간으로 분석 진행 상황을 확인할 수 있습니다</p>
+            <p>• <strong>취소 기능:</strong> 언제든지 분석을 중단할 수 있습니다</p>
+        </div>
+
+        <div class="warning">
+            <h4>⚠️ 주의사항</h4>
+            <p>• PDF 파일 크기 제한은 없지만, 메모리 사용량을 고려하여 적절한 크기로 제한하는 것을 권장합니다</p>
+            <p>• 이미지가 많은 PDF는 처리 시간이 오래 걸릴 수 있습니다</p>
+            <p>• Ollama 서버가 실행 중이어야 합니다</p>
+        </div>
+
+        <h2>🐛 오류 응답</h2>
+        
+        <div class="endpoint">
+            <h3>에러 형식</h3>
+            <pre><code>{
+  "detail": "Only PDF files are allowed"
+}</code></pre>
+            
+            <h4>주요 오류 코드</h4>
+            <table class="params-table">
+                <thead>
+                    <tr>
+                        <th>Status Code</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><code>400</code></td>
+                        <td>잘못된 요청 (PDF 파일이 아님, 텍스트 추출 실패 등)</td>
+                    </tr>
+                    <tr>
+                        <td><code>500</code></td>
+                        <td>서버 내부 오류 (Ollama 연결 실패 등)</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <h2>🔗 추가 링크</h2>
+        <ul>
+            <li><a href="/docs" target="_blank">🔧 Swagger UI (상세 API 문서)</a></li>
+            <li><a href="/pdf-test" target="_blank">🧪 웹 테스트 인터페이스</a></li>
+            <li><a href="/redoc" target="_blank">📚 ReDoc 문서</a></li>
+        </ul>
+    </div>
+
+    <script>
+        function copyText(text) {
+            navigator.clipboard.writeText(text).then(() => {
+                alert('복사되었습니다!');
+            });
+        }
+
+        function copyCode(button) {
+            const code = button.previousElementSibling.textContent;
+            navigator.clipboard.writeText(code).then(() => {
+                const originalText = button.textContent;
+                button.textContent = 'Copied!';
+                button.style.background = '#27ae60';
+                setTimeout(() => {
+                    button.textContent = originalText;
+                    button.style.background = '#3498db';
+                }, 2000);
+            });
+        }
+    </script>
+</body>
+</html>

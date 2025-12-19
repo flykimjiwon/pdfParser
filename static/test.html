@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FastAPI 테스트 페이지</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .section {
+            margin-bottom: 30px;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            background-color: #fafafa;
+        }
+        .section h3 {
+            margin-top: 0;
+            color: #555;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #333;
+        }
+        input[type="text"], input[type="number"], textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+            box-sizing: border-box;
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            margin-right: 10px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .delete-btn {
+            background-color: #dc3545;
+        }
+        .delete-btn:hover {
+            background-color: #c82333;
+        }
+        .response {
+            margin-top: 15px;
+            padding: 15px;
+            border-radius: 4px;
+            background-color: #f8f9fa;
+            border-left: 4px solid #007bff;
+            white-space: pre-wrap;
+            font-family: monospace;
+            font-size: 12px;
+        }
+        .error {
+            border-left-color: #dc3545;
+            background-color: #f8d7da;
+        }
+        .items-list {
+            margin-top: 20px;
+        }
+        .item {
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            background-color: white;
+        }
+        .item-actions {
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🚀 FastAPI 테스트 페이지</h1>
+        
+        <!-- 서버 상태 확인 -->
+        <div class="section">
+            <h3>📡 서버 상태 확인</h3>
+            <button onclick="checkServer()">서버 상태 확인</button>
+            <div id="serverResponse" class="response" style="display: none;"></div>
+        </div>
+
+        <!-- 모든 아이템 조회 -->
+        <div class="section">
+            <h3>📋 모든 아이템 조회</h3>
+            <button onclick="getAllItems()">모든 아이템 조회</button>
+            <div id="allItemsResponse" class="response" style="display: none;"></div>
+            <div id="itemsList" class="items-list"></div>
+        </div>
+
+        <!-- 새 아이템 생성 -->
+        <div class="section">
+            <h3>➕ 새 아이템 생성</h3>
+            <div class="form-group">
+                <label for="itemName">아이템 이름:</label>
+                <input type="text" id="itemName" placeholder="예: 노트북">
+            </div>
+            <div class="form-group">
+                <label for="itemDescription">설명:</label>
+                <textarea id="itemDescription" rows="3" placeholder="예: 고성능 게이밍 노트북"></textarea>
+            </div>
+            <div class="form-group">
+                <label for="itemPrice">가격:</label>
+                <input type="number" id="itemPrice" step="0.01" placeholder="예: 1299.99">
+            </div>
+            <button onclick="createItem()">아이템 생성</button>
+            <div id="createResponse" class="response" style="display: none;"></div>
+        </div>
+
+        <!-- 특정 아이템 조회 -->
+        <div class="section">
+            <h3>🔍 특정 아이템 조회</h3>
+            <div class="form-group">
+                <label for="getItemId">아이템 ID:</label>
+                <input type="number" id="getItemId" placeholder="예: 1">
+            </div>
+            <button onclick="getItem()">아이템 조회</button>
+            <div id="getResponse" class="response" style="display: none;"></div>
+        </div>
+
+        <!-- 아이템 수정 -->
+        <div class="section">
+            <h3>✏️ 아이템 수정</h3>
+            <div class="form-group">
+                <label for="updateItemId">아이템 ID:</label>
+                <input type="number" id="updateItemId" placeholder="예: 1">
+            </div>
+            <div class="form-group">
+                <label for="updateItemName">새 이름:</label>
+                <input type="text" id="updateItemName" placeholder="예: 업데이트된 노트북">
+            </div>
+            <div class="form-group">
+                <label for="updateItemDescription">새 설명:</label>
+                <textarea id="updateItemDescription" rows="3" placeholder="예: 업데이트된 설명"></textarea>
+            </div>
+            <div class="form-group">
+                <label for="updateItemPrice">새 가격:</label>
+                <input type="number" id="updateItemPrice" step="0.01" placeholder="예: 1199.99">
+            </div>
+            <button onclick="updateItem()">아이템 수정</button>
+            <div id="updateResponse" class="response" style="display: none;"></div>
+        </div>
+
+        <!-- 아이템 삭제 -->
+        <div class="section">
+            <h3>🗑️ 아이템 삭제</h3>
+            <div class="form-group">
+                <label for="deleteItemId">아이템 ID:</label>
+                <input type="number" id="deleteItemId" placeholder="예: 1">
+            </div>
+            <button class="delete-btn" onclick="deleteItem()">아이템 삭제</button>
+            <div id="deleteResponse" class="response" style="display: none;"></div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:8000';
+
+        function showResponse(elementId, data, isError = false) {
+            const element = document.getElementById(elementId);
+            element.style.display = 'block';
+            element.textContent = JSON.stringify(data, null, 2);
+            element.className = isError ? 'response error' : 'response';
+        }
+
+        async function makeRequest(url, options = {}) {
+            try {
+                const response = await fetch(url, options);
+                const data = await response.json();
+                return { data, isError: !response.ok };
+            } catch (error) {
+                return { data: { error: error.message }, isError: true };
+            }
+        }
+
+        async function checkServer() {
+            const { data, isError } = await makeRequest(`${API_BASE}/`);
+            showResponse('serverResponse', data, isError);
+        }
+
+        async function getAllItems() {
+            const { data, isError } = await makeRequest(`${API_BASE}/items`);
+            showResponse('allItemsResponse', data, isError);
+            
+            if (!isError && Array.isArray(data)) {
+                displayItemsList(data);
+            }
+        }
+
+        function displayItemsList(items) {
+            const listElement = document.getElementById('itemsList');
+            if (items.length === 0) {
+                listElement.innerHTML = '<p>아이템이 없습니다.</p>';
+                return;
+            }
+            
+            listElement.innerHTML = items.map(item => `
+                <div class="item">
+                    <strong>ID: ${item.id}</strong><br>
+                    <strong>이름:</strong> ${item.name}<br>
+                    <strong>설명:</strong> ${item.description || '없음'}<br>
+                    <strong>가격:</strong> $${item.price}<br>
+                    <div class="item-actions">
+                        <button onclick="quickDelete(${item.id})">삭제</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        async function createItem() {
+            const name = document.getElementById('itemName').value;
+            const description = document.getElementById('itemDescription').value;
+            const price = parseFloat(document.getElementById('itemPrice').value);
+
+            if (!name || !price) {
+                showResponse('createResponse', { error: '이름과 가격은 필수입니다.' }, true);
+                return;
+            }
+
+            const { data, isError } = await makeRequest(`${API_BASE}/items`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ name, description, price })
+            });
+
+            showResponse('createResponse', data, isError);
+            
+            if (!isError) {
+                document.getElementById('itemName').value = '';
+                document.getElementById('itemDescription').value = '';
+                document.getElementById('itemPrice').value = '';
+                getAllItems(); // 목록 새로고침
+            }
+        }
+
+        async function getItem() {
+            const id = document.getElementById('getItemId').value;
+            if (!id) {
+                showResponse('getResponse', { error: 'ID를 입력하세요.' }, true);
+                return;
+            }
+
+            const { data, isError } = await makeRequest(`${API_BASE}/items/${id}`);
+            showResponse('getResponse', data, isError);
+        }
+
+        async function updateItem() {
+            const id = document.getElementById('updateItemId').value;
+            const name = document.getElementById('updateItemName').value;
+            const description = document.getElementById('updateItemDescription').value;
+            const price = parseFloat(document.getElementById('updateItemPrice').value);
+
+            if (!id || !name || !price) {
+                showResponse('updateResponse', { error: 'ID, 이름, 가격은 필수입니다.' }, true);
+                return;
+            }
+
+            const { data, isError } = await makeRequest(`${API_BASE}/items/${id}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ name, description, price })
+            });
+
+            showResponse('updateResponse', data, isError);
+            
+            if (!isError) {
+                getAllItems(); // 목록 새로고침
+            }
+        }
+
+        async function deleteItem() {
+            const id = document.getElementById('deleteItemId').value;
+            if (!id) {
+                showResponse('deleteResponse', { error: 'ID를 입력하세요.' }, true);
+                return;
+            }
+
+            if (!confirm('정말로 이 아이템을 삭제하시겠습니까?')) {
+                return;
+            }
+
+            const { data, isError } = await makeRequest(`${API_BASE}/items/${id}`, {
+                method: 'DELETE'
+            });
+
+            showResponse('deleteResponse', data, isError);
+            
+            if (!isError) {
+                document.getElementById('deleteItemId').value = '';
+                getAllItems(); // 목록 새로고침
+            }
+        }
+
+        async function quickDelete(id) {
+            if (!confirm('정말로 이 아이템을 삭제하시겠습니까?')) {
+                return;
+            }
+
+            await makeRequest(`${API_BASE}/items/${id}`, { method: 'DELETE' });
+            getAllItems(); // 목록 새로고침
+        }
+
+        // 페이지 로드 시 서버 상태 확인
+        window.onload = function() {
+            checkServer();
+            getAllItems();
+        };
+    </script>
+</body>
+</html>
